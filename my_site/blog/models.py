@@ -1,3 +1,11 @@
 from django.db import models
 
-# Create your models here.
+
+class Post(models.Model):
+    slug = models.SlugField(unique=True)
+    img = models.CharField()
+    author = models.CharField()
+    date = models.TimeField(auto_now_add=True)
+    title = models.CharField()
+    excerpt = models.CharField()
+    content = models.CharField()
