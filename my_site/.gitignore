@@ -1,5 +1,6 @@
-venv/
+/venv/
 .env
 .pytest_cache/
-.idea
+/.idea/
 db.sqlite3
+/data/db
