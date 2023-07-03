@@ -1,13 +1,11 @@
-from datetime import date
-
 from django.shortcuts import render
 
 from blog.models import Post
 
 
 def index(request):
-    posts = Post.objects.order_by("-date")
-    return render(request, "blog/index.html", {"posts": posts[:3]})
+    posts = Post.objects.order_by("-date")[:3]
+    return render(request, "blog/index.html", {"posts": posts})
 
 
 def all_posts(request):
