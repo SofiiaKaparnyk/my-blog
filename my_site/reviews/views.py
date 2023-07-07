@@ -1,8 +1,11 @@
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.views import View
+from django.views.generic import DetailView, ListView
+from django.views.generic.base import TemplateView
 
 from reviews.forms import ReviewForm
+from reviews.models import Review
 
 
 class ReviewView(View):
@@ -20,5 +23,21 @@ class ReviewView(View):
         return render(request, "reviews/review.html", {"form": form})
 
 
-def thank_you(request, username):
-    return render(request, "reviews/thank_you.html", {"name": username})
+class ReviewListView(ListView):
+    template_name = "reviews/review_list.html"
+    model = Review
+    context_object_name = "reviews"
+
+
+class ReviewDetailView(DetailView):
+    template_name = "reviews/review_detail.html"
+    model = Review
+
+
+class ThankYouView(TemplateView):
+    template_name = "reviews/thank_you.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({"name": kwargs["username"]})
+        return context
