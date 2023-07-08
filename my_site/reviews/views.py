@@ -1,26 +1,34 @@
-from django.shortcuts import redirect, render
 from django.urls import reverse
-from django.views import View
-from django.views.generic import DetailView, ListView
+from django.views.generic import CreateView, DetailView, FormView, ListView
 from django.views.generic.base import TemplateView
 
 from reviews.forms import ReviewForm
 from reviews.models import Review
 
 
-class ReviewView(View):
-    def get(self, request):
-        form = ReviewForm()
-        return render(request, "reviews/review.html", {"form": form})
+class ReviewView(CreateView):
+    model = Review
+    form_class = ReviewForm
+    template_name = "reviews/review.html"
 
-    def post(self, request):
-        form = ReviewForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect(
-                reverse("thank-you", kwargs={"username": form.cleaned_data["username"]})
-            )
-        return render(request, "reviews/review.html", {"form": form})
+    def get_success_url(self):
+        """Return the URL to redirect to after processing a valid form."""
+        return reverse(
+            "thank-you", kwargs={"username": self.request.POST.get("username")}
+        )
+
+
+# class ReviewView(FormView):
+#     form_class = ReviewForm
+#     template_name = "reviews/review.html"
+#
+#     def get_success_url(self):
+#         """Return the URL to redirect to after processing a valid form."""
+#         return reverse("thank-you", kwargs={"username": self.request.POST.get("username")})
+#
+#     def form_valid(self, form):
+#         form.save()
+#         return super().form_valid(form)
 
 
 class ReviewListView(ListView):
