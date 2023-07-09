@@ -1,18 +1,19 @@
 from django.shortcuts import redirect, render
 from django.views import View
 
-
-def store_file(file):
-    with open(f"temp/{file.name}", "wb+") as dest:
-        for chunk in file.chunks():
-            dest.write(chunk)
+from profiles.forms import FileUploadForm
+from profiles.models import UserProfile
 
 
 class CreateProfileView(View):
     def get(self, request):
-        return render(request, "profiles/create_profile.html")
+        form = FileUploadForm()
+        return render(request, "profiles/create_profile.html", {"form": form})
 
     def post(self, request):
-        file = request.FILES["image"]
-        store_file(file)
-        return redirect("/profiles")
+        form = FileUploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            file = request.FILES["image"]
+            UserProfile.objects.create(image=file)
+            return redirect("/profiles")
+        return render(request, "profiles/create_profile.html", {"form": form})
