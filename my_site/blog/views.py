@@ -1,18 +1,27 @@
 from django.shortcuts import render
+from django.views.generic import DetailView, ListView
 
 from blog.models import Post
 
 
-def index(request):
-    posts = Post.objects.order_by("-date")[:3]
-    return render(request, "blog/index.html", {"posts": posts})
+class IndexView(ListView):
+    model = Post
+    template_name = "blog/index.html"
+    context_object_name = "posts"
+    ordering = ["-date"]
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        return queryset[:3]
 
 
-def all_posts(request):
-    posts = Post.objects.order_by("-date")
-    return render(request, "blog/all_posts.html", {"posts": posts})
+class PostListView(ListView):
+    model = Post
+    template_name = "blog/all_posts.html"
+    context_object_name = "posts"
+    ordering = ["-date"]
 
 
-def post_detail(request, slug):
-    post = Post.objects.get(slug=slug)
-    return render(request, "blog/post-detail.html", {"post": post})
+class PostDetailView(DetailView):
+    model = Post
+    template_name = "blog/post-detail.html"
