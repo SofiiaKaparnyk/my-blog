@@ -1,6 +1,7 @@
+from django.shortcuts import redirect
 from django.urls import reverse
-from django.views.generic import CreateView, DetailView, FormView, ListView
-from django.views.generic.base import TemplateView
+from django.views.generic import CreateView, DetailView, ListView
+from django.views.generic.base import TemplateView, View
 
 from reviews.forms import ReviewForm
 from reviews.models import Review
@@ -41,6 +42,13 @@ class ReviewDetailView(DetailView):
     template_name = "reviews/review_detail.html"
     model = Review
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["is_favorite"] = (
+            int(self.request.session.get("favorite_review")) == self.object.pk
+        )
+        return context
+
 
 class ThankYouView(TemplateView):
     template_name = "reviews/thank_you.html"
@@ -49,3 +57,10 @@ class ThankYouView(TemplateView):
         context = super().get_context_data(**kwargs)
         context.update({"name": kwargs["username"]})
         return context
+
+
+class AddFavoriteView(View):
+    def post(self, request):
+        review_id = request.POST["review_id"]
+        request.session["favorite_review"] = review_id
+        return redirect(reverse("detail-review", kwargs={"pk": review_id}))
