@@ -1,6 +1,6 @@
-from django.shortcuts import render
 from django.views.generic import DetailView, ListView
 
+from blog.forms import CommentForm
 from blog.models import Post
 
 
@@ -25,3 +25,9 @@ class PostListView(ListView):
 class PostDetailView(DetailView):
     model = Post
     template_name = "blog/post-detail.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        form = CommentForm()
+        context["comment_form"] = form
+        return context

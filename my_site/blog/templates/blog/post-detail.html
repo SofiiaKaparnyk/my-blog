@@ -20,7 +20,8 @@
         {% endif %}
         <address>By <a href="mailto:{{post.author.email}}">{{ post.author|title }}</a></address>
         <div>
-            Last updated on <time>{{ post.date }}</time>
+            Last updated on
+            <time>{{ post.date }}</time>
         </div>
     </article>
 </section>
@@ -30,4 +31,17 @@
         {{ post.content|linebreaks }}
     </p>
 </main>
+<section id="comment-form">
+    <h2>Your Comment</h2>
+    <form>
+        {% for field in comment_form %}
+        <div class="form-control">
+            {{ field.label_tag}}
+            {{ field }}
+            {{ field.errors }}
+        </div>
+        {% endfor %}
+        <button>Save Comment</button>
+    </form>
+</section>
 {% endblock %}
