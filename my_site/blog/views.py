@@ -1,4 +1,6 @@
-from django.views.generic import DetailView, ListView
+from django.shortcuts import redirect, render, reverse
+from django.views import View
+from django.views.generic import ListView
 
 from blog.forms import CommentForm
 from blog.models import Post
@@ -22,12 +24,22 @@ class PostListView(ListView):
     ordering = ["-date"]
 
 
-class PostDetailView(DetailView):
-    model = Post
-    template_name = "blog/post-detail.html"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+class PostDetailView(View):
+    def get(self, request, slug):
+        post = Post.objects.get(slug=slug)
         form = CommentForm()
-        context["comment_form"] = form
-        return context
+        return render(
+            request, "blog/post-detail.html", {"comment_form": form, "post": post}
+        )
+
+    def post(self, request, slug):
+        post = Post.objects.get(slug=slug)
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            new_comment = form.save(commit=False)
+            new_comment.post = post
+            new_comment.save()
+            return redirect(reverse("post-detail", args=[slug]))
+        return render(
+            request, "blog/post-detail.html", {"comment_form": form, "post": post}
+        )
